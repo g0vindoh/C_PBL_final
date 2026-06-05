@@ -1,0 +1,16 @@
+# Compiled executables
+*.exe
+
+# Installer output (large binary - distribute via GitHub Releases)
+installer/Output/
+
+# Build artifacts
+*.o
+*.a
+
+# Logs generated at runtime
+logs/
+
+# Editor directories
+.vscode/
+.idea/

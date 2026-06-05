@@ -42,8 +42,16 @@ else
     RUN      = ./$(EXE)
 endif
 
+# ── SDL2 static build paths (Windows only) ──────────────────────────
+# Download SDL2-2.30.6 MinGW dev package from:
+#   https://github.com/libsdl-org/SDL/releases/tag/release-2.30.6
+# and extract to C:/SDL2-2.30.6 (or adjust SDL_STATIC_* below).
+SDL_STATIC_INC = C:/Users/hp/Downloads/SDL2-2.30.6/x86_64-w64-mingw32/include/SDL2
+SDL_STATIC_LIB = C:/Users/hp/Downloads/SDL2-2.30.6/x86_64-w64-mingw32/lib
+ISCC            = $(LOCALAPPDATA)/Programs/Inno Setup 6/ISCC.exe
+
 # ── Build rules ──────────────────────────────────────────────────────
-.PHONY: all clean run dirs
+.PHONY: all clean run dirs release installer
 
 all: dirs $(EXE)
 
@@ -56,6 +64,25 @@ $(EXE): $(SRC)
 
 run: all
 	$(RUN)
+
+# Portable single-EXE release: SDL2 statically linked, no DLL needed.
+# Run:  make release   (Windows only)
+release: dirs
+	C:/mingw64/bin/gcc.exe -Wall -Wextra -O2 \
+	    -Iinclude -I$(SDL_STATIC_INC) -DSDL_MAIN_HANDLED \
+	    $(SRC) -o SmartTrafficSystem_portable.exe \
+	    -L$(SDL_STATIC_LIB) -lmingw32 -mwindows \
+	    -Wl,-Bstatic -lSDL2main -lSDL2 -Wl,-Bdynamic \
+	    -ldinput8 -ldxguid -ldxerr8 \
+	    -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 \
+	    -lshell32 -lsetupapi -lversion -luuid \
+	    -static-libgcc -lm
+	@echo "Portable EXE: SmartTrafficSystem_portable.exe"
+
+# Build the Windows installer (requires: make release, Inno Setup 6)
+installer: release
+	"$(ISCC)" installer/SmartTraffic.iss
+	@echo "Installer: installer/Output/SmartTrafficSystem_Setup.exe"
 
 clean:
 	$(RM) $(EXE)
