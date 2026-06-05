@@ -3,6 +3,7 @@
 #include "../include/simulation.h"
 #include "../include/ui.h"
 #include <math.h>
+#include <time.h>
 
 /* ── Background city grid ────────────────────────────────────────── */
 static void draw_city_bg(SDL_Renderer *r, int night, Uint32 ticks) {
@@ -64,16 +65,25 @@ static void draw_city_bg(SDL_Renderer *r, int night, Uint32 ticks) {
         draw_rect_outline(r, blocks[i].x, blocks[i].y, blocks[i].w, blocks[i].h, outline, 1);
     }
 
-    /* Stars (night only) */
+    /* Stars (night only) — positions precomputed once with a local LCG
+       so the global PRNG is never touched during rendering. */
     if (night) {
-        srand(42); /* deterministic stars */
+        static int star_x[60], star_y[60];
+        static int stars_ready = 0;
+        if (!stars_ready) {
+            unsigned int seed = 42u;
+            for (int i = 0; i < 60; i++) {
+                seed = seed * 1664525u + 1013904223u;
+                star_x[i] = (int)(seed % (unsigned)WINDOW_W);
+                seed = seed * 1664525u + 1013904223u;
+                star_y[i] = (int)(seed % (unsigned)(WINDOW_H / 3));
+            }
+            stars_ready = 1;
+        }
         SDL_Color star = {200, 210, 255, (Uint8)(100 + pulse * 80)};
         for (int i = 0; i < 60; i++) {
-            int sx = rand() % WINDOW_W;
-            int sy = rand() % (WINDOW_H / 3);
-            draw_rect_filled(r, sx, sy, 1 + (i % 2), 1 + (i % 2), star);
+            draw_rect_filled(r, star_x[i], star_y[i], 1 + (i % 2), 1 + (i % 2), star);
         }
-        srand((unsigned)time(NULL)); /* restore random */
     }
 }
 

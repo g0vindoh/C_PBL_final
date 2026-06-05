@@ -41,9 +41,10 @@ void signal_update_all(SignalArray *sa, int *queue_lens) {
     for (int i = 0; i < sa->count; i++) {
         Signal *sig = &sa->signals[i];
 
-        /* Emergency override – keep green until expired */
+        /* Emergency override – keep green until expired.
+           Use SDL_TICKS_PASSED to handle Uint32 wraparound safely. */
         if (sig->forced_green) {
-            if (now > sig->forced_until) {
+            if (SDL_TICKS_PASSED(now, sig->forced_until)) {
                 sig->forced_green = 0;
             } else {
                 sig->phase = SIG_GREEN;
@@ -164,9 +165,17 @@ static void draw_signal(SDL_Renderer *r, const Signal *sig) {
         }
     }
 
-    /* Countdown timer text */
+    /* Countdown timer text — show remaining time in current phase */
     char buf[16];
-    int countdown = CLAMP(sig->phase_ticks / 60 + 1, 0, 99);
+    int phase_limit;
+    switch (sig->phase) {
+        case SIG_GREEN:  phase_limit = sig->green_dur;  break;
+        case SIG_YELLOW: phase_limit = sig->yellow_dur; break;
+        case SIG_RED:    phase_limit = sig->red_dur;    break;
+        default:         phase_limit = sig->red_dur;    break;
+    }
+    int remaining  = phase_limit - sig->phase_ticks;
+    int countdown  = CLAMP(remaining / 60 + 1, 0, 99);
     snprintf(buf, sizeof(buf), "%d", countdown);
     SDL_Color txt = {200, 200, 200, 255};
     draw_text_simple(r, buf, x - 6, y + 32, 1, txt);

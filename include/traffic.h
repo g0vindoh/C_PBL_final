@@ -71,7 +71,7 @@ void sim_trigger_accident(SimState *s);
 void sim_spawn_emergency(SimState *s);
 void road_network_draw(SDL_Renderer *r, const RoadNetwork *rn, int night_mode, const AccidentArray *aa);
 void road_draw_heatmap(SDL_Renderer *r, const Road *road, float density, int night_mode);
-void queue_push(LaneQueue *q, int vid);
+int  queue_push(LaneQueue *q, int vid);  /* returns 1 on success, 0 on malloc fail */
 int  queue_pop(LaneQueue *q);
 void queue_clear(LaneQueue *q);
 

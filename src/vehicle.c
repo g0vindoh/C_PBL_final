@@ -44,6 +44,8 @@ Vehicle *vehicle_spawn(VehicleList *vl, VehicleType type, Direction dir,
 
     memset(v, 0, sizeof(*v));
     v->id       = vl->next_id++;
+    /* Clamp type to valid range before array indexing */
+    if ((int)type < 0 || (int)type >= VT_COUNT) type = VT_CAR;
     v->type     = type;
     v->dir      = dir;
     v->route_id = route_id;
@@ -87,13 +89,14 @@ Vehicle *vehicle_spawn(VehicleList *vl, VehicleType type, Direction dir,
 void vehicle_remove(VehicleList *vl, Vehicle *v) {
     if (!vl || !v) return;
     Vehicle **pp = &vl->head;
+    int found = 0;
     while (*pp) {
-        if (*pp == v) { *pp = v->next; break; }
+        if (*pp == v) { *pp = v->next; found = 1; break; }
         pp = &(*pp)->next;
     }
     v->next   = NULL; /* prevent stale traversal from any lingering reference */
     v->active = 0;
-    vl->count--;
+    if (found) vl->count--;  /* only decrement when actually removed */
 }
 
 /* ── Stop-line check helpers (used internally) ────────────────────── */

@@ -16,7 +16,7 @@ typedef enum {
 
 /* ── Single vehicle ──────────────────────────────────────────────── */
 typedef struct Vehicle {
-    int          id;
+    unsigned int id;
     VehicleType  type;
     VehicleState state;
     Direction    dir;
@@ -43,9 +43,9 @@ typedef struct Vehicle {
 typedef struct {
     Vehicle  pool[MAX_VEHICLES];
     Vehicle *head;          /* linked list of active vehicles   */
-    int      count;
-    int      total_spawned;
-    int      next_id;
+    int          count;
+    int          total_spawned;
+    unsigned int next_id;
 } VehicleList;
 
 /* ── API ─────────────────────────────────────────────────────────── */

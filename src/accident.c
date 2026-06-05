@@ -29,6 +29,8 @@ void accident_trigger(AccidentArray *aa, float x, float y) {
             return;
         }
     }
+    log_event("WARNING: all %d accident slots occupied, trigger at (%.0f, %.0f) dropped.",
+              MAX_ACCIDENTS, x, y);
 }
 
 void accident_update_all(AccidentArray *aa) {
