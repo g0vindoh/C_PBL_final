@@ -7,14 +7,18 @@
 /* ════════════════════════════════════════════════════════════════════
    LANE QUEUE
    ════════════════════════════════════════════════════════════════════ */
-void queue_push(LaneQueue *q, int vid) {
+int queue_push(LaneQueue *q, int vid) {
     QNode *n = (QNode *)malloc(sizeof(QNode));
-    if (!n) return;
+    if (!n) {
+        log_event("WARNING: queue_push malloc failed, vehicle %d dropped from queue.", vid);
+        return 0;
+    }
     n->vehicle_id = vid;
     n->next = NULL;
     if (!q->rear) { q->front = q->rear = n; }
     else          { q->rear->next = n; q->rear = n; }
     q->size++;
+    return 1;
 }
 
 int queue_pop(LaneQueue *q) {
@@ -130,14 +134,18 @@ static VehicleType pick_type(float density) {
 
 /* ── Trigger an accident at a random road position ───────────────── */
 void sim_trigger_accident(SimState *s) {
-    /* Pick random position on a road */
-    int r = rand() % 4;
+    /* All 8 roads: 2 horizontal main + 3 vertical + 3 connector horizontals */
+    int r = rand() % 8;
     float x, y;
     switch(r) {
         case 0: x = RAND_RANGE(100, WINDOW_W-100); y = INT_Y1; break;
         case 1: x = RAND_RANGE(100, WINDOW_W-100); y = INT_Y4; break;
         case 2: x = INT_X1; y = RAND_RANGE(100, WINDOW_H-100); break;
-        default:x = INT_X2; y = RAND_RANGE(100, WINDOW_H-100); break;
+        case 3: x = INT_X2; y = RAND_RANGE(100, WINDOW_H-100); break;
+        case 4: x = INT_X3; y = RAND_RANGE(100, WINDOW_H-100); break;
+        case 5: x = RAND_RANGE(INT_X1, INT_X3);   y = 400;     break;
+        case 6: x = RAND_RANGE(100, WINDOW_W-100); y = 160;     break;
+        default:x = RAND_RANGE(100, WINDOW_W-100); y = 640;     break;
     }
     accident_trigger(&s->accidents, x, y);
 }

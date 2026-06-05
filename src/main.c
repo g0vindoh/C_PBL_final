@@ -5,6 +5,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#ifdef _WIN32
+#  include <direct.h>   /* _mkdir */
+#else
+#  include <sys/stat.h> /* mkdir  */
+#endif
 
 #define TARGET_FPS   60
 #define FRAME_MS     (1000 / TARGET_FPS)
@@ -78,14 +83,11 @@ int main(int argc, char *argv[]) {
     (void)argc; (void)argv;
     srand((unsigned)time(NULL));
 
-    /* Ensure log directory exists */
+    /* Ensure log directory exists (no system() shell — use direct API) */
 #ifdef _WIN32
-    (void)system("if not exist logs mkdir logs");
+    _mkdir("logs");
 #else
-    {
-        int _r = system("mkdir -p logs");
-        (void)_r;
-    }
+    mkdir("logs", 0755);
 #endif
 
     /* SDL init */

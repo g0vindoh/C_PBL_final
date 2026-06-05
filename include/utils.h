@@ -65,7 +65,7 @@
 #define ABS(x)          ((x)<0?-(x):(x))
 #define MIN(a,b)        ((a)<(b)?(a):(b))
 #define MAX(a,b)        ((a)>(b)?(a):(b))
-#define RAND_RANGE(a,b) ((a)+rand()%((b)-(a)+1))
+#define RAND_RANGE(a,b) ((a) + ((b) >= (a) ? rand() % ((b)-(a)+1) : 0))
 #define DEG2RAD(d)      ((d)*3.14159265f/180.0f)
 
 /* ── Direction enum ─────────────────────────────────────────────── */

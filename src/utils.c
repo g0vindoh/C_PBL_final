@@ -50,6 +50,10 @@ void draw_circle_filled(SDL_Renderer *r, int cx, int cy, int radius, SDL_Color c
 
 /* ── Rounded rectangle (approximate) ─────────────────────────────── */
 void draw_rounded_rect(SDL_Renderer *r, int x, int y, int w, int h, int rad, SDL_Color c) {
+    /* Clamp radius so inner dimensions never go negative */
+    if (rad > w / 2) rad = w / 2;
+    if (rad > h / 2) rad = h / 2;
+    if (rad < 0)     rad = 0;
     /* Fill inner cross */
     draw_rect_filled(r, x+rad, y, w-2*rad, h, c);
     draw_rect_filled(r, x, y+rad, w, h-2*rad, c);
