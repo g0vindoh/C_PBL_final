@@ -25,7 +25,7 @@ OutputBaseFilename=SmartTrafficSystem_Setup
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
-SetupIconFile=
+SetupIconFile=icon.ico
 UninstallDisplayName={#AppName}
 UninstallDisplayIcon={app}\{#InstalledExe}
 PrivilegesRequired=lowest
@@ -43,11 +43,12 @@ Name: "startmenuicon"; Description: "Create a Start Menu shortcut"; GroupDescrip
 [Files]
 ; The main executable (SDL2 statically linked - no other DLLs needed)
 Source: "..\{#AppExe}"; DestDir: "{app}"; DestName: "{#InstalledExe}"; Flags: ignoreversion
+Source: "icon.ico";    DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\{#AppName}";      Filename: "{app}\{#InstalledExe}"
+Name: "{group}\{#AppName}";           Filename: "{app}\{#InstalledExe}"; IconFilename: "{app}\icon.ico"
 Name: "{group}\Uninstall {#AppName}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#InstalledExe}"; Tasks: desktopicon
+Name: "{autodesktop}\{#AppName}";     Filename: "{app}\{#InstalledExe}"; IconFilename: "{app}\icon.ico"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\{#InstalledExe}"; Description: "{cm:LaunchProgram,{#StringChange(AppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
